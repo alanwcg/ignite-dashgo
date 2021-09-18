@@ -23,21 +23,29 @@ import { useState } from "react";
 import { Header } from "../../components/Header";
 import { SideBar } from "../../components/Sidebar";
 import { Pagination } from "../../components/Pagination";
-import { useUsers } from "../../services/hooks/useUsers";
+import { getUsers, User, useUsers } from "../../services/hooks/useUsers";
 import { queryClient } from "../../services/queryClient";
 import { api } from "../../services/api";
+import { GetServerSideProps } from "next";
 
-export default function UserList() {
+interface UserListProps {
+  users: User[];
+  totalCount: number;
+}
+
+export default function UserList(props: UserListProps) {
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, isFetching, error } = useUsers(page);
+  const { data, isLoading, isFetching, error } = useUsers(page, {
+    initialData: props,
+  });
 
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
 
-  async function handlePrefetchUser(userId: string) {
+  async function handlePrefetchUser(userId: string) { 
     await queryClient.prefetchQuery(['user', userId], async () => {
       const response = await api.get(`/users/${userId}`);
 
@@ -149,4 +157,15 @@ export default function UserList() {
       </Flex>
     </Box>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { users, totalCount } = await getUsers(1);
+
+  return {
+    props: {
+      users,
+      totalCount,
+    }
+  }
 }

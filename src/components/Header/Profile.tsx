@@ -1,10 +1,14 @@
 import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
 
+import { useAuth } from '../../contexts/AuthContext';
+
 interface ProfileProps {
   showProfileData?: boolean;
 }
 
 export function Profile({ showProfileData }: ProfileProps) {
+  const { user } = useAuth();
+
   return (
     <Flex align="center">
       {showProfileData && (
@@ -14,7 +18,7 @@ export function Profile({ showProfileData }: ProfileProps) {
             color="gray.300"
             fontSize="sm"
           >
-            alancintra7@gmail.com
+            {user?.email}
           </Text>
         </Box>
       )}
